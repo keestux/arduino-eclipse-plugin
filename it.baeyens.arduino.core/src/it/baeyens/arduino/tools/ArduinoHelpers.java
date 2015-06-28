@@ -518,8 +518,8 @@ public class ArduinoHelpers extends Common {
 	}
 	String buildVariantPath = makeEnvironmentVar(ENV_KEY_PLATFORM_PATH) + "/variants/" + makeEnvironmentVar(ArduinoConst.ENV_KEY_build_variant);
 
-	Common.setBuildEnvironmentVariable(contribEnv, confDesc, ENV_KEY_ARCHITECTURE, architecture.toUpperCase());
-	Common.setBuildEnvironmentVariable(contribEnv, confDesc, ENV_KEY_BUILD_ARCH, architecture.toUpperCase());
+	Common.setBuildEnvironmentVariable(contribEnv, confDesc, ENV_KEY_ARCHITECTURE, architecture);
+	Common.setBuildEnvironmentVariable(contribEnv, confDesc, ENV_KEY_BUILD_ARCH, architecture);
 	// from 1.6.2 the hardware path can also contain a version number
 	// TOFIX test with boardmanager and without board manager
 	Common.setBuildEnvironmentVariable(contribEnv, confDesc, ENV_KEY_HARDWARE_PATH, platformFile.removeLastSegments(3).toString());
