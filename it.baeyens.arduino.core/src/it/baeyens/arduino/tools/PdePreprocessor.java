@@ -78,7 +78,7 @@ public class PdePreprocessor {
 		    body += "\n";
 		    body += "#error the file: " + curResource.getName() + " is not found in the indexer though it exists on the file system.\n";
 		    body += "#error this is probably due to a bad eclipse configuration : ino and pde are not marked as c++ file.\n";
-		    body += "#error please check wether *.ino and *.pde are marked as C++ source code in windows->preferences->C/C++->file types.\n";
+		    body += "#error please check whether *.ino and *.pde are marked as C++ source code in windows->preferences->C/C++->file types.\n";
 		} else {
 		    IASTTranslationUnit asttu = tu.getAST(index, ITranslationUnit.AST_SKIP_FUNCTION_BODIES | ITranslationUnit.AST_SKIP_ALL_HEADERS);
 		    IASTNode astNodes[] = asttu.getChildren();
@@ -124,7 +124,7 @@ public class PdePreprocessor {
 	// body += "\n";
 	// body += "#error the file: " + inoFile + " is not found in the indexer though it exists on the file system.\n";
 	// body += "#error this is probably due to a bad eclipse configuration : ino and pde are not marked as c++ file.\n";
-	// body += "#error please check wether *.ino and *.pde are marked as C++ source code in windows->preferences->C/C++->file types.\n";
+	// body += "#error please check whether *.ino and *.pde are marked as C++ source code in windows->preferences->C/C++->file types.\n";
 	// } else {
 	// IASTTranslationUnit asttu = tu.getAST(index, ITranslationUnit.AST_SKIP_FUNCTION_BODIES | ITranslationUnit.AST_SKIP_ALL_HEADERS);
 	// IASTNode astNodes[] = asttu.getChildren();
