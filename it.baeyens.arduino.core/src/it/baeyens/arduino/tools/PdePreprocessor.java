@@ -91,7 +91,7 @@ public class PdePreprocessor {
 			    addString = addString.replaceAll("\n", " ");
 			    addString = addString.replaceAll("\\{.+\\}", "");
 			    if (addString.contains("=")) {
-				// ignore when there are assignements in the declaration
+				// ignore when there are assignments in the declaration
 			    } else {
 				body += addString + ";\n";
 			    }
