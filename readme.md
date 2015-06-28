@@ -34,7 +34,7 @@ open it.baeyens.arduino.product/target/products/it.baeyens.arduino.product/macos
 On Linux you can run start eclipse using provided shell script:
 
 ```bash
-./build_then_launch_plugin.sh
+./build_then_launch.sh
 ```
 
 ### Running the IDE/Plugin
@@ -46,7 +46,7 @@ Windows
  
 Mac OSX and Linux
  
- * ./build_then_launch_plugin.sh
+ * ./build_then_launch.sh
 
 =======
 
