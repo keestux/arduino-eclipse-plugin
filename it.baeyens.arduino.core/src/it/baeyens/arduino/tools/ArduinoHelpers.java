@@ -427,19 +427,33 @@ public class ArduinoHelpers extends Common {
 
 	String boardVariant = getBuildEnvironmentVariable(configurationDescription, ENV_KEY_build_variant, "");
 	String buildCoreFolder = getBuildEnvironmentVariable(configurationDescription, ENV_KEY_build_core_folder, "");
-	if (buildCoreFolder.contains(":")) {
-	    String sections[] = buildCoreFolder.split(":");
-	    if (sections.length != 2) {
-		Common.log(new Status(IStatus.ERROR, ArduinoConst.CORE_PLUGIN_ID, "the value for key " + ENV_KEY_build_core_folder
-			+ " in boards.txt is invalid:" + buildCoreFolder, null));
-	    } else {
-		String architecture = getBuildEnvironmentVariable(configurationDescription, ENV_KEY_ARCHITECTURE, "");
-		addCodeFolder(project, WORKSPACE_PATH_VARIABLE_NAME_ARDUINO, ARDUINO_HARDWARE_FOLDER_NAME + "/" + sections[1] + "/" + architecture
-			+ "/" + ARDUINO_CORE_FOLDER_NAME + "/" + sections[1], "arduino/core", configurationDescription);
-	    }
-	} else {
+	String sections[] = buildCoreFolder.split(":");
+	if (sections.length == 1) {
+	    // Normal situation, native Arduino
 	    addCodeFolder(project, PATH_VARIABLE_NAME_ARDUINO_PLATFORM, ARDUINO_CORE_FOLDER_NAME + "/" + buildCoreFolder, "arduino/core",
 		    configurationDescription);
+	} else if (sections.length == 2) {
+	    // This may be VendorID : CoreId
+	    String vendorId = sections[0];
+	    String coreId = sections[1];
+	    if (vendorId.equals("arduino") && coreId.equals("arduino")) {
+		if (false) {
+		    // TODO Find out if directory exists
+		    addCodeFolder(project, PATH_VARIABLE_NAME_ARDUINO_PLATFORM, ARDUINO_CORE_FOLDER_NAME + "/" + coreId, "arduino/core",
+			    configurationDescription);
+		} else {
+		    // Fall back to standard Arduino location
+		    String architecture = getBuildEnvironmentVariable(configurationDescription, ENV_KEY_ARCHITECTURE, "");
+		    addCodeFolder(project, WORKSPACE_PATH_VARIABLE_NAME_ARDUINO, ARDUINO_HARDWARE_FOLDER_NAME + "/" + coreId + "/" + architecture
+			    + "/" + ARDUINO_CORE_FOLDER_NAME + "/" + coreId, "arduino/core", configurationDescription);
+		}
+	    } else {
+		Common.log(new Status(IStatus.ERROR, ArduinoConst.CORE_PLUGIN_ID, "only arduino:arduino is supported right now", null));
+	    }
+	} else {
+	    // This is an unknown syntax.
+	    Common.log(new Status(IStatus.ERROR, ArduinoConst.CORE_PLUGIN_ID, "the value for key " + ENV_KEY_build_core_folder
+			+ " in boards.txt is invalid:" + buildCoreFolder, null));
 	}
 	if (!boardVariant.equals("")) {
 	    ArduinoHelpers.addCodeFolder(project, PATH_VARIABLE_NAME_ARDUINO_PINS, boardVariant, "arduino/variant", configurationDescription);
