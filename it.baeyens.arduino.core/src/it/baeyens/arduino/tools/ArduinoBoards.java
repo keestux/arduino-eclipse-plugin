@@ -44,14 +44,14 @@ public class ArduinoBoards {
     }
 
     /**
-     * This method returns the full section so custom processing can be done.
+     * This method returns the full section of a board.
      * 
-     * @param SectionKey
+     * @param board
      *            the first name on the line before the .
      * @return all entries that match the filter
      */
-    public Map<String, String> getSection(String SectionKey) {
-	return mArduinoSupportedBoards.get(SectionKey);
+    public Map<String, String> getBoardSection(String board) {
+	return mArduinoSupportedBoards.get(board);
     }
 
     // /**
@@ -385,7 +385,7 @@ public class ArduinoBoards {
     }
 
     public String getMenuNameFromID(String menuID) {
-	Map<String, String> menuSectionMap = getSection("menu");
+	Map<String, String> menuSectionMap = getBoardSection("menu");
 	for (Entry<String, String> curOption : menuSectionMap.entrySet()) {
 	    if (curOption.getKey().equals(menuID)) {
 		return curOption.getValue();
@@ -395,7 +395,7 @@ public class ArduinoBoards {
     }
 
     public String getMenuIDFromName(String menuName) {
-	Map<String, String> menuSectionMap = getSection("menu");
+	Map<String, String> menuSectionMap = getBoardSection("menu");
 	for (Entry<String, String> curOption : menuSectionMap.entrySet()) {
 	    if (curOption.getValue().equals(menuName)) {
 		return curOption.getKey();
@@ -406,7 +406,7 @@ public class ArduinoBoards {
 
     public String getMenuItemIDFromName(String boardID, String menuID, String menuItemName) {
 	// look in the pre 1.5.4 way "menu".menuid.boardid.menuitemid=name
-	Map<String, String> menuSectionMap = getSection("menu");
+	Map<String, String> menuSectionMap = getBoardSection("menu");
 	for (Entry<String, String> curOption : menuSectionMap.entrySet()) {
 	    if (curOption.getValue().equals(menuItemName)) {
 		String[] keySplit = curOption.getKey().split("\\.");
@@ -421,14 +421,14 @@ public class ArduinoBoards {
 
     public String getMenuItemNameFromID(String boardID, String menuID, String menuItemID) {
 	// look in the pre 1.5.4 way "menu".menuid.boardid.menuitemid=name
-	Map<String, String> menuSectionMap = getSection("menu");
+	Map<String, String> menuSectionMap = getBoardSection("menu");
 	String lookupValue = menuID + "." + boardID + "." + menuItemID;
 	for (Entry<String, String> curOption : menuSectionMap.entrySet()) {
 	    if (curOption.getKey().equalsIgnoreCase(lookupValue))
 		return curOption.getValue();
 	}
 	// nothing found so look in the post 1.5.4 way boardid."menu".menuid.menuitemid=name
-	Map<String, String> BoardIDSectionMap = getSection(boardID);
+	Map<String, String> BoardIDSectionMap = getBoardSection(boardID);
 	String loopupValue = "menu." + menuID + "." + menuItemID;
 	for (Entry<String, String> curOption : BoardIDSectionMap.entrySet()) {
 	    if (curOption.getKey().equalsIgnoreCase(loopupValue))

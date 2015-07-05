@@ -648,7 +648,7 @@ public class ArduinoHelpers extends Common {
 	String boardID = boardsFile.getBoardIDFromName(boardName);
 
 	// Get the boards section and add all entries to the environment variables
-	Map<String, String> boardSectionMap = boardsFile.getSection(boardID);
+	Map<String, String> boardSectionMap = boardsFile.getBoardSection(boardID);
 	for (Entry<String, String> currentPair : boardSectionMap.entrySet()) {
 	    // if it is not a menu item add it
 	    if (!currentPair.getKey().startsWith("menu.")) {
@@ -672,7 +672,7 @@ public class ArduinoHelpers extends Common {
 	    }
 	}
 
-	Map<String, String> menuSectionMap = boardsFile.getSection("menu");
+	Map<String, String> menuSectionMap = boardsFile.getBoardSection("menu");
 	String[] optionNames = boardsFile.getMenuNames();
 	for (int currentOption = 0; currentOption < optionNames.length; currentOption++) {
 	    String optionName = optionNames[currentOption];
