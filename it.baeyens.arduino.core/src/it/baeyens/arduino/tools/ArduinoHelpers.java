@@ -874,20 +874,44 @@ public class ArduinoHelpers extends Common {
 	// Arduino uses the board approach for the upload tool.
 	// as I'm not I create some special entries to work around it
 	try {
-	    String uploadTool = contribEnv.getVariable(ArduinoConst.ENV_KEY_upload_tool, confDesc).getValue().toUpperCase();
-	    var = new EnvironmentVariable("A.CMD", makeEnvironmentVar("A.TOOLS." + uploadTool + ".CMD"));
-	    contribEnv.addVariable(var, confDesc);
-	    var = new EnvironmentVariable("A.PATH", makeEnvironmentVar("A.TOOLS." + uploadTool + ".PATH"));
-	    contribEnv.addVariable(var, confDesc);
-	    var = new EnvironmentVariable("A.CMD.PATH", makeEnvironmentVar("A.TOOLS." + uploadTool + ".CMD.PATH"));
-	    contribEnv.addVariable(var, confDesc);
-	    var = new EnvironmentVariable("A.CONFIG.PATH", makeEnvironmentVar("A.TOOLS." + uploadTool + ".CONFIG.PATH"));
-	    contribEnv.addVariable(var, confDesc); // End of section Arduino uses
-						   // the board approach for the
-						   // upload tool.
+	    String uploadTool = contribEnv.getVariable(ArduinoConst.ENV_KEY_upload_tool, confDesc).getValue();
+	    String myUploadTool = uploadTool;
+	    String sections[] = uploadTool.split(":");
+	    if (sections.length == 1) {
+		// Normal situation, native Arduino
+	    } else if (sections.length == 2) {
+		// This may be VendorID : ToolId
+		String vendorId = sections[0];
+		String toolId = sections[1];
+		if (vendorId.equals("arduino")) {
+		    // Use the Arduino tool
+		    myUploadTool = toolId;
+		} else {
+		    // We don't (yet) support other tool vendors
+		    myUploadTool = null;
+		    Common.log(new Status(IStatus.ERROR, ArduinoConst.CORE_PLUGIN_ID, "only arduino:nnn  is supported right now", null));
+		}
+	    } else {
+		// This is an unknown syntax
+		myUploadTool = null;
+		Common.log(new Status(IStatus.ERROR, ArduinoConst.CORE_PLUGIN_ID, "the value for key " + ENV_KEY_upload_tool
+			+ " in boards.txt is invalid: " + uploadTool, null));
+	    }
+	    if (myUploadTool != null) {
+		myUploadTool = myUploadTool.toUpperCase();
+		var = new EnvironmentVariable("A.CMD", makeEnvironmentVar("A.TOOLS." + myUploadTool + ".CMD"));
+		contribEnv.addVariable(var, confDesc);
+		var = new EnvironmentVariable("A.PATH", makeEnvironmentVar("A.TOOLS." + myUploadTool + ".PATH"));
+		contribEnv.addVariable(var, confDesc);
+		var = new EnvironmentVariable("A.CMD.PATH", makeEnvironmentVar("A.TOOLS." + myUploadTool + ".CMD.PATH"));
+		contribEnv.addVariable(var, confDesc);
+		var = new EnvironmentVariable("A.CONFIG.PATH", makeEnvironmentVar("A.TOOLS." + myUploadTool + ".CONFIG.PATH"));
+		contribEnv.addVariable(var, confDesc);
+	    }
 	} catch (Exception e) {
 	    // ignore this exception as there is no upload tool defined.
 	}
+	// End of section "Arduino uses the board approach for the upload tool."
 
     }
 

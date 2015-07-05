@@ -92,11 +92,36 @@ public class UploadSketchWrapper {
 	    realUploader = new GenericLocalUploader(UpLoadTool, Project, cConf, myConsole, myErrconsoleStream, myOutconsoleStream);
 	    uploadJobName = UpLoadTool;
 	} else {
-	    myHighLevelConsoleStream.println("using arduino loader");
-	    realUploader = new arduinoUploader(Project, cConf, UpLoadTool, myConsole);
-	    uploadJobName = UpLoadTool;
+	    String myUploadTool = UpLoadTool;
+	    String sections[] = UpLoadTool.split(":");
+	    if (sections.length == 1) {
+		// Normal situation, native Arduino
+	    } else if (sections.length == 2) {
+		// This may be VendorID : ToolId
+		String vendorId = sections[0];
+		String toolId = sections[1];
+		if (vendorId.equals("arduino")) {
+		    // Use the Arduino tool
+		    myUploadTool = toolId;
+		} else {
+		    // We don't (yet) support other tool vendors
+		    myUploadTool = null;
+		    Common.log(new Status(IStatus.ERROR, ArduinoConst.CORE_PLUGIN_ID, "only arduino:nnn  is supported right now", null));
+		}
+	    } else {
+		// This is an unknown syntax
+		myUploadTool = null;
+		Common.log(new Status(IStatus.ERROR, ArduinoConst.CORE_PLUGIN_ID, "the value for key " + ArduinoConst.ENV_KEY_upload_tool
+			+ " in boards.txt is invalid: " + UpLoadTool, null));
+	    }
+	    if (myUploadTool != null) {
+		myHighLevelConsoleStream.println("using arduino loader");
+		realUploader = new arduinoUploader(Project, cConf, myUploadTool, myConsole);
+		uploadJobName = myUploadTool;
+	    }
 	}
 
+	// TODO FIXME uploadJobName *can* be null
 	Job uploadjob = new UploadJobWrapper(uploadJobName, Project, cConf, realUploader);
 	uploadjob.setRule(null);
 	uploadjob.setPriority(Job.LONG);
