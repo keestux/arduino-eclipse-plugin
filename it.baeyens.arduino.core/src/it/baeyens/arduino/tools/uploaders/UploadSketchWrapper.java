@@ -92,9 +92,19 @@ public class UploadSketchWrapper {
 	    realUploader = new GenericLocalUploader(UpLoadTool, Project, cConf, myConsole, myErrconsoleStream, myOutconsoleStream);
 	    uploadJobName = UpLoadTool;
 	} else {
+	    // Look at UpLoadTool. If it is "arduino:avrdude" then use the second half
+	    String myUpLoadTool = UpLoadTool;
+	    if (UpLoadTool.contains(":")) {
+		String sections[] = UpLoadTool.split(":");
+		if (sections.length == 2 && sections[0].equals("arduino")) {
+		    myUpLoadTool = sections[1];
+		} else {
+		    // Error
+		}
+	    }
 	    myHighLevelConsoleStream.println("using arduino loader");
-	    realUploader = new arduinoUploader(Project, cConf, UpLoadTool, myConsole);
-	    uploadJobName = UpLoadTool;
+	    realUploader = new arduinoUploader(Project, cConf, myUpLoadTool, myConsole);
+	    uploadJobName = myUpLoadTool;
 	}
 
 	Job uploadjob = new UploadJobWrapper(uploadJobName, Project, cConf, realUploader);

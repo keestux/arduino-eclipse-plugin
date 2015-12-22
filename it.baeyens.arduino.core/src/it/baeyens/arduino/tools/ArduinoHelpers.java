@@ -982,11 +982,33 @@ public class ArduinoHelpers extends Common {
 	// Arduino uses the board approach for the upload tool.
 	// as I'm not I create some special entries to work around it
 	try {
-	    String uploadTool = contribEnv.getVariable(ArduinoConst.ENV_KEY_upload_tool, confDesc).getValue().toUpperCase();
-	    Common.setBuildEnvironmentVariable(contribEnv, confDesc, "A.CMD", makeEnvironmentVar("A.TOOLS." + uploadTool + ".CMD"));
-	    Common.setBuildEnvironmentVariable(contribEnv, confDesc, "A.PATH", makeEnvironmentVar("A.TOOLS." + uploadTool + ".PATH"));
-	    Common.setBuildEnvironmentVariable(contribEnv, confDesc, "A.CMD.PATH", makeEnvironmentVar("A.TOOLS." + uploadTool + ".CMD.PATH"));
-	    Common.setBuildEnvironmentVariable(contribEnv, confDesc, "A.CONFIG.PATH", makeEnvironmentVar("A.TOOLS." + uploadTool + ".CONFIG.PATH"));
+	    String uploadTool = contribEnv.getVariable(ArduinoConst.ENV_KEY_upload_tool, confDesc).getValue();
+	    String myUploadTool = uploadTool;
+	    String sections[] = uploadTool.split(":");
+	    if (sections.length == 1) {
+		// Normal situation, native Arduino
+	    } else if (sections.length == 2) {
+		// This may be VendorID : ToolId
+		String vendorId = sections[0];
+		String toolId = sections[1];
+		if (vendorId.equals("arduino")) {
+		    // Use the Arduino tool
+		    myUploadTool = toolId;
+		} else {
+		    // We don't (yet) support other tool vendors
+		    // TODO Issue an error message
+		}
+	    } else {
+		// This is an unknown syntax. We should issue a warning message
+		myUploadTool = null;
+	    }
+	    if (myUploadTool != null) {
+		myUploadTool = myUploadTool.toUpperCase();
+		Common.setBuildEnvironmentVariable(contribEnv, confDesc, "A.CMD", makeEnvironmentVar("A.TOOLS." + myUploadTool + ".CMD"));
+		Common.setBuildEnvironmentVariable(contribEnv, confDesc, "A.PATH", makeEnvironmentVar("A.TOOLS." + myUploadTool + ".PATH"));
+		Common.setBuildEnvironmentVariable(contribEnv, confDesc, "A.CMD.PATH", makeEnvironmentVar("A.TOOLS." + myUploadTool + ".CMD.PATH"));
+		Common.setBuildEnvironmentVariable(contribEnv, confDesc, "A.CONFIG.PATH", makeEnvironmentVar("A.TOOLS." + myUploadTool + ".CONFIG.PATH"));
+	    }
 	} catch (Exception e) {
 	    // ignore this exception as there is no upload tool defined.
 	}
