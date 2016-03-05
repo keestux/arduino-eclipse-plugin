@@ -1094,9 +1094,18 @@ public class Helpers extends Common {
 	// Arduino uses the board approach for the upload tool.
 	// as I'm not I mod it so the upload tool is in the command
 	try {
-
-	    String uploadTool = contribEnv.getVariable(Const.ENV_KEY_upload_tool, confDesc).getValue().toUpperCase();
-	    String uploadRecipe = "A.TOOLS." + uploadTool.toUpperCase() + ".UPLOAD.PATTERN";//$NON-NLS-1$//$NON-NLS-2$
+	    // Look at UpLoadTool. If it is "arduino:avrdude" then use the second half
+	    String uploadTool = contribEnv.getVariable(Const.ENV_KEY_upload_tool, confDesc).getValue();
+	    String myUpLoadTool = uploadTool;
+	    if (uploadTool.contains(":")) {
+		String sections[] = uploadTool.split(":");
+		if (sections.length == 2 && sections[0].equals("arduino")) {
+		    myUpLoadTool = sections[1];
+		} else {
+		    // Error
+		}
+	    }
+	    String uploadRecipe = "A.TOOLS." + myUpLoadTool.toUpperCase() + ".UPLOAD.PATTERN";//$NON-NLS-1$//$NON-NLS-2$
 	    String UploadCommand = contribEnv.getVariable(uploadRecipe, confDesc).getValue();
 	    int indexOfVar = UploadCommand.indexOf("${A."); //$NON-NLS-1$
 	    while (indexOfVar != -1) {
@@ -1104,7 +1113,7 @@ public class Helpers extends Common {
 		if (endIndexOfVar != -1) {
 		    String foundSuffix = UploadCommand.substring(indexOfVar + 3, endIndexOfVar);
 		    String foundVar = "A" + foundSuffix; //$NON-NLS-1$
-		    String replaceVar = "A.TOOLS." + uploadTool.toUpperCase() + foundSuffix; //$NON-NLS-1$
+		    String replaceVar = "A.TOOLS." + myUpLoadTool.toUpperCase() + foundSuffix; //$NON-NLS-1$
 		    if (contribEnv.getVariable(replaceVar, confDesc) != null) {
 			UploadCommand = UploadCommand.replaceAll(foundVar, replaceVar);
 		    }
@@ -1115,7 +1124,7 @@ public class Helpers extends Common {
 	    setBuildEnvironmentVariable(contribEnv, confDesc, uploadRecipe, UploadCommand);
 	    // I still need to set this one
 	    setBuildEnvironmentVariable(contribEnv, confDesc, "A.PATH", //$NON-NLS-1$
-		    makeEnvironmentVar("A.TOOLS." + uploadTool + ".PATH")); //$NON-NLS-1$ //$NON-NLS-2$
+		    makeEnvironmentVar("A.TOOLS." + myUpLoadTool.toUpperCase() + ".PATH")); //$NON-NLS-1$ //$NON-NLS-2$
 
 	} catch (Exception e) {
 	    Common.log(new Status(IStatus.WARNING, Const.CORE_PLUGIN_ID, "parsing of upload recipe failed", e)); //$NON-NLS-1$
