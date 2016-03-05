@@ -40,7 +40,10 @@ public class ToolDependency {
     public Tool getTool() {
 	Package pkg = this.platform.getPackage();
 	if (!pkg.getName().equals(this.packager)) {
-	    pkg = Manager.getPackage(this.packager);
+	    Package pkg2 = Manager.getPackage(this.packager);
+	    if (pkg2 != null) {
+		pkg = pkg2;
+	    }
 	}
 
 	return pkg.getTool(this.name, this.version);
